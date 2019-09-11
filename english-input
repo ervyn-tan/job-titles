@@ -1,0 +1,210 @@
+<html>
+
+    <head>
+        <title>Job title autofill</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+
+    <body>
+        <style>
+            * { box-sizing: border-box; }
+            body {
+                font: 16px Arial;
+            }
+            .autocomplete {
+                /*the container must be positioned relative:*/
+                position: relative;
+                display: inline-block;
+            }
+            input {
+                border: 1px solid transparent;
+                background-color: #f1f1f1;
+                padding: 10px;
+                font-size: 16px;
+            }
+            input[type=text] {
+                background-color: #f1f1f1;
+                width: 100%;
+            }
+            input[type=submit] {
+                background-color: DodgerBlue;
+                color: #fff;
+            }
+            .autocomplete-items {
+                position: absolute;
+                border: 1px solid #d4d4d4;
+                border-bottom: none;
+                border-top: none;
+                z-index: 99;
+                /*position the autocomplete items to be the same width as the container:*/
+                top: 100%;
+                left: 0;
+                right: 0;
+            }
+            .autocomplete-items div {
+                padding: 10px;
+                cursor: pointer;
+                background-color: #fff;
+                border-bottom: 1px solid #d4d4d4;
+            }
+            .autocomplete-items div:hover {
+                /*when hovering an item:*/
+                background-color: #e9e9e9;
+            }
+            .autocomplete-active {
+                /*when navigating through the items using the arrow keys:*/
+                background-color: DodgerBlue !important;
+                color: #ffffff;
+            }
+            .cms-row {
+                margin-left: 0;
+                margin-right: 0;
+            }
+            .cms-full {
+                width: 900px;
+            }
+            .center {
+                text-align: center;
+            }
+            .cms-padding-top {
+                padding-top: 200px;
+            }
+            .cms-align-left {
+                text-align: left;
+            }
+        </style>
+        <div class ="cms-row cms-padding-top">
+            <div class="cms-full center">
+                <!--Make sure the form has the autocomplete function switched off:-->
+                <form autocomplete="off" action="/action_page.php">
+                    <div class="autocomplete cms-align-left " style="width:300px;">
+                        <input id="myInput" type="text" name="title" placeholder="Job title">
+                    </div>
+
+                    <input type="submit">
+                </form>
+            </div>
+        </div>
+        <script>
+
+            var jobTitles = ['Account Director', 'Account Executive', 'Account Manager', 'Accountant', 'Administration Manager', 'Administrator', 'Advisor', 'Analyst', 'Analyst Programmer', 'Analytics Manager', 'Android Developer', 'Application Analyst', 'Application Architect', 'Application Consultant', 'Application Developer', 'Application Engineer', 'Architect', 'Assistant Director', 'Assistant General Manager', 'Assistant IT Manager', 'Assistant Manager', 'Assistant Vice President', 'Associate', 'Associate Consultant', 'Associate Director', 'Associate Software Engineer', 'Big Data Engineer', 'Bioinformatics Specialist', 'Board Member', 'Business Analyst', 'Business Consultant', 'Business Development Director', 'Business Development Executive', 'Business Development Manager', 'Business Director', 'Business Manager', 'Business Owner', 'Business Professional', 'Chairman', 'Chief Architect', 'Chief Digital Officer', 'Chief Executive Officer', 'Chief Financial Officer', 'Chief Information Officer', 'Chief Information Security Officer', 'Chief Innovation Officer', 'Chief Marketing Officer', 'Chief Operations Officer', 'Chief Product Officer', 'Chief Risk Officer', 'Chief Strategy Officer', 'Chief Technology Officer', 'Client Partner', 'Cloud Architect', 'Cloud Consultant', 'Cloud Engineer', 'Co-Founder', 'Consultant', 'Country Manager', 'Creative Director', 'Data Analyst', 'Data Engineer', 'Data Scientist', 'Database Administrator', 'Delivery Manager', 'Deputy Director', 'Deputy Manager', 'Deputy Project Manager', 'Designer', 'Developer', 'Development Manager', 'Devops Engineer', 'Digital Manager', 'Digital Marketing Manager', 'Director', 'Director, Engineering', 'Director, Information Technology', 'Director, Operations', 'Director, Sales', 'End User', 'Engineer', 'Engineering Director', 'Engineering Manager', 'Enterprise Architect', 'Executive', 'Executive Director', 'Executive Manager', 'Finance Director', 'Finance Manager', 'First Vice President', 'Founder', 'Full Stack Developer', 'General Manager', 'Group Chief Executive Officer', 'Group Chief Information Officer', 'Head of Business Development', 'Head of Data Science', 'Head of Engineering', 'Head of Information Technology', 'Head of Marketing', 'Head of Operations', 'Head of Product', 'Head of Sales', 'Head of Technology', 'Higher Engineering Officer', 'Higher Principal Engineering Officer', 'HR Manager', 'Information Technology Director', 'Information Technology Manager', 'Infrastructure Engineer', 'Infrastructure Manager', 'Instructional Technology Coach', 'Intern', 'IT Administrator', 'IT Analyst', 'IT Architect', 'IT Consultant', 'IT Department Manager', 'IT Director', 'IT Engineer', 'IT Executive', 'IT Head', 'IT Infrastructure Manager', 'IT Management', 'IT Manager', 'IT Officer', 'IT Project Manager', 'IT Specialist', 'IT Support', 'IT Systems Engineer', 'Java Developer', 'Lead', 'Lead Consultant', 'Lead Data Scientist', 'Lead Developer', 'Lead Engineer', 'Lead Software Engineer', 'Lecturer', 'Machine Learning Engineer', 'Management Associate', 'Manager', 'Manager, Engineering', 'Manager, Information Technology', 'Manager, Operations', 'Manager, Product', 'Manager, Technology', 'Managing Director', 'Managing Partner', 'Marketing Director', 'Marketing Executive', 'Marketing Manager', 'Marketing Specialist', 'Network Consultant', 'Network Engineer', 'Ninja', 'Office Manager', 'Operations Director', 'Operations Manager', 'Other', 'Owner', 'Partner', 'President', 'Principal', 'Principal Architect', 'Principal Consultant', 'Principal Engineer', 'Principal Engineering Officer', 'Principal Software Engineer', 'Procurement Manager', 'Producer', 'Product Development Manager', 'Product Manager', 'Product Owner', 'Program Manager', 'Programmer', 'Project Director', 'Project Lead', 'Project Manager', 'R&D Engineer', 'Regional Director', 'Regional IT Manager', 'Regional Manager', 'Regional Manager, Information Technology', 'Regional Marketing Manager', 'Regional Sales Manager', 'Research Assistant', 'Research Associate', 'Research Engineer', 'Research Fellow', 'Research Scientist', 'Researcher', 'Rock Star', 'Sales Director', 'Sales Engineer', 'Sales Executive', 'Sales Manager', 'Regional Sales Director', 'Security Consultant', 'Senior Account Manager', 'Senior Analyst', 'Senior Application Analyst', 'Senior Application Consultant', 'Senior Application Developer', 'Senior Business Analyst', 'Senior Business Development Manager', 'Senior Consultant', 'Senior Data Analyst', 'Senior Data Engineer', 'Senior Data Scientist', 'Senior Director', 'Senior Engineer', 'Senior Engineering Officer', 'Senior Executive', 'Senior IT Consultant', 'Senior IT Engineer', 'Senior IT Executive', 'Senior IT Manager', 'Senior Manager', 'Senior Marketing Manager', 'Senior Network Engineer', 'Senior Product Manager', 'Senior Project Manager', 'Senior Research Engineer', 'Senior Sales Manager', 'Senior Software Developer', 'Senior Software Engineer', 'Senior Solutions Architect', 'Software Consultant', 'Software Developer', 'Software Engineer', 'Software Manager', 'Solutions Architect', 'Solutions Consultant', 'Solutions Engineer', 'Scientist', 'Senior Associate', 'Senior Developer', 'Senior Lecturer', 'Senior Officer', 'Senior Specialist', 'Senior Systems Analyst', 'Senior Systems Engineer', 'Senior Vice President', 'Senior Web Developer', 'Service Delivery Manager', 'Service Manager', 'Software Architect', 'Specialist', 'Staff Engineer', 'Staff Software Engineer', 'Student', 'Systems Administrator', 'Systems Analyst', 'Systems Consultant', 'Systems Engineer', 'Systems Manager', 'Teacher', 'Team Lead', 'Technical Account Manager', 'Technical Architect', 'Technical Consultant', 'Technical Director', 'Technical Lead', 'Technical Manager', 'Technical Project Manager', 'Technical Specialist', 'Technical Staff', 'Technology Consultant', 'Technology Lead', 'Technology Manager', 'UX Designer', 'Vice President', 'Vice President, Engineering', 'Vice President, Information Technology', 'Vice President, Operations', 'Vice President, Technology', 'Web Developer', 'Wintel Engineer', 'Founder & CEO', 'Group CFO', 'IT/ICT Coordinator', 'IT/ICT Director', 'IT/ICT Manager', 'Supervisor', 'Director, Finance', 'Director, Technology', 'Assistant Principal', 'Senior Systems Administrator', 'Senior Systems Specialist', 'Systems Specialist', 'Application Manager', 'Assistant Manager, Information Technology', 'Assistant Marketing Manager', 'Assistant Principal Engineer', 'Associate Engineer', 'Associate Partner', 'Associate Professor', 'Auditor', 'Automation Engineer', 'Backend Developer', 'BI Consultant', 'Brand Manager', 'Business Developer', 'Business Intelligence Analyst', 'Chief Commercial Officer', 'Chief Data Officer', 'Chief Engineer', 'Chief Technical Officer', 'Client Manager', 'Cloud Solutions Architect', 'Cloud Specialist', 'Communications Manager', 'Compliance Manager', 'Consulting Manager', 'Corporate Communications Manager', 'Customer Engineer', 'Customer Success Manager', 'Data Architect', 'Data Lead', 'Deputy Chief Executive Officer', 'Deputy Managing Director', 'Design Director', 'Development Lead', 'Digital Marketing Executive', 'Director, Business Development', 'Director, Product Management', 'Driver', 'Editor', 'Engagement Manager', 'Engineering Officer', 'Entrepreneur', 'Executive Assistant', 'Executive Vice President', 'Financial Controller', 'Freelancer', 'Full Stack Engineer', 'Global Account Manager', 'Group Chief Financial Officer', 'Group IT Manager', 'Head of Digital', 'Head of Finance', 'Head of HR', 'Head of Strategy', 'HR Executive', 'ICT Manager', 'Information Security Manager', 'Information Technology Officer', 'Information Technology Project Manager', 'Investment Analyst', 'Investment Manager', 'iOS Developer', 'IT Assistant Manager', 'IT Business Analyst', 'IT Infrastructure Engineer', 'IT Lead', 'IT Operations Manager', 'IT Security Engineer', 'IT Security Manager', 'IT Senior Manager', 'IT Support Engineer', 'Key Account Manager', 'Lead Architect', 'Lead Solution Architect', 'Lead Systems Analyst', 'Lead Systems Engineer', 'Management Consultant', 'Manager, Information Technology Infrastructure', 'Manager, Information Technology Project', 'Manager, Technical', 'Marketing Analyst', 'Marketing Head', 'Network Manager', 'Officer', 'Operations Analyst', 'Partner Manager', 'PhD Student', 'Platform Architect', 'Portfolio Manager', 'Pre-Sales Consultant', 'Principal Manager', 'Principal Solution Architect', 'Principal Systems Engineer', 'Principle Engineer', 'Product Engineer', 'Product Executive', 'Product Lead', 'Product Marketing Manager', 'Product Specialist', 'Program Director', 'Project Coordinator', 'Project Engineer', 'Project Manager, Information Technology', 'Proprietor', 'Recruiter', 'Regional Business Development Manager', 'Regional Director, Information Technology', 'Relationship Manager', 'Research Analyst', 'Research Director', 'Research Manager', 'Sales & Marketing Manager', 'Sales Consultant', 'Sales Specialist', 'Secretary', 'Section Head', 'Security Analyst', 'Security Engineer', 'Self Employed', 'Senior Application Specialist', 'Senior Architect', 'Senior Assistant Director', 'Senior Associate Director', 'Senior Deputy Director', 'Senior Development Engineer', 'Senior Devops Engineer', 'Senior Information Technology Manager', 'Senior Infrastructure Engineer', 'Senior IT Analyst', 'Senior IT Specialist', 'Senior Java Developer', 'Senior Program Manager', 'Senior Quality Assessor', 'Senior Research Fellow', 'Senior Systems Consultant', 'Software Development Manager', 'Software Specialist', 'Solutions Designer', 'Solutions Manager', 'Staff Analyst', 'Statistician', 'Superintendent', 'Systems Architect', 'Technical Executive', 'Technical Program Manager', 'Technician', 'Technologist', 'Technology Analyst', 'Technology Architect', 'Technology Director', 'Technology Specialist', 'Test Engineer', 'UI/UX Designer', 'Web Designer'];
+            function autocomplete(inp, arr) {
+            /*the autocomplete function takes two arguments,
+             the text field element and an array of possible autocompleted values:*/
+            var currentFocus;
+            /*execute a function when someone writes in the text field:*/
+            inp.addEventListener("input", function (e) {
+            var a, b, i, val = this.value;
+            /*close any already open lists of autocompleted values*/
+            closeAllLists();
+            if (!val) {
+            return false;
+            }
+            currentFocus = - 1;
+            /*create a DIV element that will contain the items (values):*/
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            /*append the DIV element as a child of the autocomplete container:*/
+            this.parentNode.appendChild(a);
+            /*for each item in the array...*/
+            for (i = 0; i < arr.length; i++) {
+            /*check if the item starts with the same letters as the text field value:*/
+            if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+            /*create a DIV element for each matching element:*/
+            b = document.createElement("DIV");
+            /*make the matching letters bold:*/
+            b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+            b.innerHTML += arr[i].substr(val.length);
+            /*insert a input field that will hold the current array item's value:*/
+            b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+            /*execute a function when someone clicks on the item value (DIV element):*/
+            b.addEventListener("click", function (e) {
+            /*insert the value for the autocomplete text field:*/
+            inp.value = this.getElementsByTagName("input")[0].value;
+            /*close the list of autocompleted values,
+             (or any other open lists of autocompleted values:*/
+            closeAllLists();
+            });
+            b.addEventListener("keypress", function (e) {
+            /*insert the value for the autocomplete text field:*/
+            if (e.keyCode === 13) {
+            inp.value = this.getElementsByTagName("input")[0].value;
+            }
+            /*close the list of autocompleted values,
+             (or any other open lists of autocompleted values:*/
+            closeAllLists();
+            });
+            a.appendChild(b);
+            }
+            }
+            });
+            /*execute a function presses a key on the keyboard:*/
+            inp.addEventListener("keydown", function (e) {
+            var x = document.getElementById(this.id + "autocomplete-list");
+            if (x)
+                    x = x.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+            /*If the arrow DOWN key is pressed,
+             increase the currentFocus variable:*/
+            currentFocus++;
+            /*and and make the current item more visible:*/
+            addActive(x);
+            } else if (e.keyCode == 38) { //up
+            /*If the arrow UP key is pressed,
+             decrease the currentFocus variable:*/
+            currentFocus--;
+            /*and and make the current item more visible:*/
+            addActive(x);
+            } else if (e.keyCode == 13) {
+            /*If the ENTER key is pressed, prevent the form from being submitted,*/
+            e.preventDefault();
+            if (currentFocus > - 1) {
+            /*and simulate a click on the "active" item:*/
+            if (x)
+                    x[currentFocus].click();
+            }
+            }
+            });
+            function addActive(x) {
+            /*a function to classify an item as "active":*/
+            if (!x)
+                    return false;
+            /*start by removing the "active" class on all items:*/
+            removeActive(x);
+            if (currentFocus >= x.length)
+                    currentFocus = 0;
+            if (currentFocus < 0)
+                    currentFocus = (x.length - 1);
+            /*add class "autocomplete-active":*/
+            x[currentFocus].classList.add("autocomplete-active");
+            }
+            function removeActive(x) {
+            /*a function to remove the "active" class from all autocomplete items:*/
+            for (var i = 0; i < x.length; i++) {
+            x[i].classList.remove("autocomplete-active");
+            }
+            }
+            function closeAllLists(elmnt) {
+            /*close all autocomplete lists in the document,
+             except the one passed as an argument:*/
+            var x = document.getElementsByClassName("autocomplete-items");
+            for (var i = 0; i < x.length; i++) {
+            if (elmnt != x[i] && elmnt != inp) {
+            x[i].parentNode.removeChild(x[i]);
+            }
+            }
+            }
+            /*execute a function when someone clicks in the document:*/
+            document.addEventListener("click", function (e) {
+            closeAllLists(e.target);
+            });
+            }
+
+            autocomplete(document.getElementById("myInput"), jobTitles);
+        </script>
+
+    </body>
+
+</html>
